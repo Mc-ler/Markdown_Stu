@@ -1,0 +1,35 @@
+<!--This page was wrote to examine the result of XML study-->
+<home_page>
+    <title place="top">
+        this column is about functions and how this website run.
+        <log_in reference="login_page.com"></log_in>
+        <sign_in reference="sign_in_page.com"></sign_in>
+        <designing>Ing</designing>
+    </title>
+
+    <examples place="center">
+        <!--two or three is enough!-->
+        <image_group>[image](https:image.com)</image_group>
+        <image_cite>[image](https:image.com)</image_cite>
+    </examples>
+
+    <motto>
+        [phrase] WE ARE ALL STARS!!!
+        <logo>[logo_image](https:example/logo.com)</logo>
+    </motto>
+
+    <stars place="bottom">
+        <converts>
+            <!--this parameter need image, description, and website url-->
+            <element>words description: Here's our hot function</element>
+            <element>image (https:image.com)</element>
+        </converts>
+
+        <linking></linking>
+
+        <share></share>
+
+        <designing>Ing</designing>
+
+    </stars>  
+</home_page>
