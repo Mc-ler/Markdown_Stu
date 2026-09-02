@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Score Statistics — Mathematical Analysis Report</title>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    tags: 'ams'
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --muted: #555;
+    --accent: #2563eb;
+    --code-bg: #f6f8fa;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.65;
+    color: var(--fg);
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  h1 { font-size: 1.9rem; border-bottom: 2px solid var(--accent); padding-bottom: .4rem; }
+  h2 { font-size: 1.35rem; margin-top: 2.2rem; color: var(--accent); }
+  h3 { font-size: 1.1rem; margin-top: 1.4rem; }
+  p { margin: .6rem 0; }
+  code {
+    background: var(--code-bg);
+    padding: .12rem .35rem;
+    border-radius: 4px;
+    font-size: .92em;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: .9rem 1rem;
+    overflow-x: auto;
+    font-size: .88em;
+  }
+  pre code { background: none; padding: 0; }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    margin: 1rem 0;
+    padding: .3rem 1rem;
+    color: var(--muted);
+    background: #f9fafb;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+    font-size: .95em;
+  }
+  th, td { border: 1px solid var(--border); padding: .5rem .7rem; text-align: left; }
+  th { background: var(--code-bg); }
+  .muted { color: var(--muted); font-size: .9em; }
+  .equation-note { font-size: .85em; color: var(--muted); }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+
+<h1>Mathematical Analysis of <code>score_statistics.py</code></h1>
+<p class="muted">Extracted from the calculation pipeline in <code>calculate_score_statistics</code> &mdash; prepared for re-deduction in a manuscript. All formulas are LaTeX and rendered via MathJax.</p>
+
+<h2>1. Overview of the Algorithm</h2>
+<p>The function <code>calculate_score_statistics</code> processes a list of course records and produces four summary quantities:</p>
+<ol>
+  <li><strong>Total credit</strong> $C$</li>
+  <li><strong>Credit-weighted GPA</strong> $G$</li>
+  <li><strong>Credit-weighted average score</strong> $S$</li>
+  <li><strong>Incomplete count</strong> $I$ and <strong>course count</strong> $N$</li>
+</ol>
+<p>The pipeline is: <em>filter &rarr; validate credit &rarr; accumulate weighted sums &rarr; divide &rarr; handle empty cases</em>.</p>
+
+<h2>2. Notation</h2>
+<p>Let the input be a collection of records. Only records that are mappings (dict-like) are kept; the rest are discarded entirely.</p>
+<p>For each kept course $i$, define three raw fields:</p>
+<ul>
+  <li>$c_i$ &mdash; credit (<code>coursePoint</code>)</li>
+  <li>$g_i$ &mdash; GPA (<code>gpa</code>)</li>
+  <li>$s_i$ &mdash; score (<code>score</code>)</li>
+</ul>
+<p>A value is called <strong>finite</strong> if it is a real number (not <code>bool</code>, not <code>NaN</code>, not $\pm\infty$), per the helper <code>_finite_number</code>. Denote the finite-validity predicate as:</p>
+<p>$$
+\text{finite}(x) = \begin{cases}
+\text{true}, & x \in \mathbb{R},\ x \notin \{\text{NaN}, \pm\infty\},\ x \notin \{\text{True}, \text{False}\} \\
+\text{false}, & \text{otherwise}
+\end{cases}
+$$</p>
+
+<h2>3. Mathematical Formulation</h2>
+
+<h3>3.1 Course Eligibility (Credit Gate)</h3>
+<p>A course $i$ is <strong>counted</strong> (enters <code>courses</code> and <code>total_credit</code>) if and only if its credit is finite and strictly positive:</p>
+<p>$$
+i \in \mathcal{C} \iff \text{finite}(c_i)\ \wedge\ c_i > 0
+$$</p>
+<p>If the credit is missing, non-finite, or $\le 0$, the course is <strong>excluded</strong> from all sums and contributes $+1$ to the incomplete count.</p>
+
+<h3>3.2 Total Credit</h3>
+<p>$$
+C = \sum_{i \in \mathcal{C}} c_i
+$$</p>
+
+<h3>3.3 Credit-Weighted GPA</h3>
+<p>Let $\mathcal{C}_g = \{\, i \in \mathcal{C} : \text{finite}(g_i) \,\}$ be the subset of counted courses that have a valid GPA. Then:</p>
+<p>$$
+G = \frac{\displaystyle \sum_{i \in \mathcal{C}_g} g_i\, c_i}{\displaystyle \sum_{i \in \mathcal{C}_g} c_i}
+$$</p>
+<p>with the convention:</p>
+<p>$$
+G = \text{None} \quad \text{if} \quad \mathcal{C}_g = \varnothing \quad \left(\text{i.e.}\ \sum_{i\in\mathcal{C}_g} c_i = 0\right)
+$$</p>
+
+<h3>3.4 Credit-Weighted Average Score</h3>
+<p>Similarly, let $\mathcal{C}_s = \{\, i \in \mathcal{C} : \text{finite}(s_i) \,\}$. Then:</p>
+<p>$$
+S = \frac{\displaystyle \sum_{i \in \mathcal{C}_s} s_i\, c_i}{\displaystyle \sum_{i \in \mathcal{C}_s} c_i}
+$$</p>
+<p>with:</p>
+<p>$$
+S = \text{None} \quad \text{if} \quad \mathcal{C}_s = \varnothing
+$$</p>
+
+<h3>3.5 Incomplete Count</h3>
+<p>The incomplete counter accumulates in two disjoint situations:</p>
+<p>$$
+I = \underbrace{\bigl|\, \{\, i \notin \mathcal{C} \,\} \,\bigr|}_{\text{invalid credit}} \;+\; \underbrace{\bigl|\, \{\, i \in \mathcal{C} : \neg\,\text{finite}(g_i)\ \vee\ \neg\,\text{finite}(s_i) \,\} \,\bigr|}_{\text{valid credit but missing GPA or score}}
+$$</p>
+<blockquote>Note: a course with valid credit but <strong>both</strong> GPA and score missing is still counted only <strong>once</strong> here (the <code>if gpa is None or score is None</code> is a single OR-check).</blockquote>
+
+<h3>3.6 Course Count</h3>
+<p>$$
+N = |\mathcal{C}|
+$$</p>
+
+<h3>3.7 Global Guard</h3>
+<p>The whole result is <code>None</code> if there is no usable data:</p>
+<p>$$
+\text{return None} \iff C \le 0
+$$</p>
+
+<h2>4. Mapping: Code Lines &rarr; Math Symbols</h2>
+<table>
+  <thead>
+    <tr><th>Code Element</th><th>Math Symbol</th><th>Meaning</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>total_credit</code></td><td>$C$</td><td>Sum of eligible course credits</td></tr>
+    <tr><td><code>gpa_total</code></td><td>$\sum_{i\in\mathcal{C}_g} g_i c_i$</td><td>Weighted GPA numerator</td></tr>
+    <tr><td><code>gpa_credit</code></td><td>$\sum_{i\in\mathcal{C}_g} c_i$</td><td>GPA denominator</td></tr>
+    <tr><td><code>score_total</code></td><td>$\sum_{i\in\mathcal{C}_s} s_i c_i$</td><td>Weighted score numerator</td></tr>
+    <tr><td><code>score_credit</code></td><td>$\sum_{i\in\mathcal{C}_s} c_i$</td><td>Score denominator</td></tr>
+    <tr><td><code>weighted_gpa</code></td><td>$G$</td><td>$gpa\_total / gpa\_credit$</td></tr>
+    <tr><td><code>weighted_average</code></td><td>$S$</td><td>$score\_total / score\_credit$</td></tr>
+    <tr><td><code>incomplete</code></td><td>$I$</td><td>Missing-data count</td></tr>
+    <tr><td><code>courses</code></td><td>$N$</td><td>Eligible course count</td></tr>
+  </tbody>
+</table>
+
+<h2>5. Key Semantic Observations</h2>
+<ol>
+  <li><strong>Asymmetric credit handling.</strong> A course with invalid credit is <em>fully excluded</em> (no GPA/score contribution, no credit). A course with valid credit but missing GPA/score still contributes its credit to $C$ and to the <em>other</em> weighted sum, but not to the missing one. So $C$ is <strong>not</strong> generally equal to $\sum_{i\in\mathcal{C}_g} c_i$ nor $\sum_{i\in\mathcal{C}_s} c_i$.</li>
+  <li><strong>Two different denominators.</strong> $G$ and $S$ are each normalized by <em>their own</em> credit sum, not by $C$. This means $G$ and $S$ are <strong>not</strong> weighted over the same population unless every counted course has both GPA and score.</li>
+  <li><strong><code>bool</code> is rejected.</strong> Because <code>bool</code> is a subclass of <code>int</code> in Python, <code>True</code>/<code>False</code> would silently become $1.0$/$0.0$; the code explicitly blocks this.</li>
+  <li><strong>Non-finite values are treated as missing</strong>, not as errors &mdash; $\infty$/NaN never propagate into the sums.</li>
+  <li><strong>The <code>None</code> conventions</strong> (empty GPA set, empty score set, or $C \le 0$) are the "no data" sentinels.</li>
+</ol>
+
+<h2>6. Suggested Re-factoring Structure for the Manuscript</h2>
+<p>To re-derive this cleanly, present it as a <strong>two-stage estimator</strong>:</p>
+<p><strong>Stage A &mdash; Selection:</strong> define the eligibility sets $\mathcal{C}$, $\mathcal{C}_g$, $\mathcal{C}_s$ via the finite/positive predicates.</p>
+<p><strong>Stage B &mdash; Aggregation:</strong> define the weighted-mean operator</p>
+<p>$$
+\bar{x}_w(\mathcal{A}) = \frac{\sum_{i\in\mathcal{A}} x_i c_i}{\sum_{i\in\mathcal{A}} c_i}, \qquad \bar{x}_w(\varnothing) = \text{None}
+$$</p>
+<p>and then simply state:</p>
+<p>$$
+G = \bar{g}_w(\mathcal{C}_g), \qquad S = \bar{s}_w(\mathcal{C}_s)
+$$</p>
+<p>This makes the code's logic a direct transcription of the math and much easier to verify.</p>
+
+<hr>
+<p class="muted">Source file: <code>score_statistics.py</code> &mdash; report generated for manuscript re-deduction.</p>
+
+</body>
+</html>
