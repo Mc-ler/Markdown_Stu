@@ -1,5 +1,12 @@
 Filter personal and sensitive files: 
-/R Practice/Query_Grades.csv
-/R Practice/score_statistics_report.html
+/Calculation/Query_Grades.csv
+/Calculation/score_statistics_report.html
 /san-juan-mountains-1080.webp
 /Emoji_List_Clone.md
+
+# R related
+*.Rproj.user
+*.Rproj
+.Rhistory
+*.Rout
+*_Rout.txt
