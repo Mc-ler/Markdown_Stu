@@ -3,6 +3,7 @@ Filter personal and sensitive files:
 /Calculation/score_statistics_report.html
 /san-juan-mountains-1080.webp
 /Emoji_List_Clone.md
+*.pdf
 
 # R related
 *.Rproj.user

@@ -1,4 +1,4 @@
-library(tidyverse)
+library("tidyverse")
 
 id <- 1:120
 memory_raw <- tibble(
@@ -7,41 +7,11 @@ memory_raw <- tibble(
   gender_code = rep(c(1L, 2L, 1L, 1L, 2L), length.out = 120),
   age = 18 + ((id * 7) %% 8),
   sleep_hours = round(5.2 + ((id * 11) %% 32) / 10, 1),
-  anxiety_score = round(
-    42 +
-      ((id * 13) %% 17) -
-      8 +
-      if_else(condition_code == 1L, 2, 0) +
-      sin(id / 4) * 3
-  ),
-  mem_pre = round(
-    17 +
-      ((id * 5) %% 8) +
-      cos(id / 5) * 1.5
-  ),
-  mem_post = round(
-    mem_pre +
-      if_else(condition_code == 2L, 3, 1) +
-      (((id * 3) %% 5) - 2) / 2
-  ),
-  rt_ms = round(
-    560 +
-      if_else(condition_code == 1L, 45, -10) +
-      ((id * 17) %% 81) -
-      40 +
-      anxiety_score * 0.7 -
-      sleep_hours * 4
-  ),
-  acc_rate = round(
-    pmin(
-      pmax(
-        0.68 + if_else(condition_code == 2L, 0.07, 0) + (mem_post - 20) * 0.012 - ((id * 7) %% 11) / 100,
-        0.55
-      ),
-      0.98
-    ),
-    2
-  ),
+  anxiety_score = round(42 + ((id * 13) %% 17) - 8 + if_else(condition_code == 1L, 2, 0) + sin(id / 4) * 3),
+  mem_pre = round(17 + ((id * 5) %% 8) + cos(id / 5) * 1.5),
+  mem_post = round(mem_pre + if_else(condition_code == 2L, 3, 1) + (((id * 3) %% 5) - 2) / 2),
+  rt_ms = round(560 + if_else(condition_code == 1L, 45, -10) + ((id * 17) %% 81) - 40 + anxiety_score * 0.7 - sleep_hours * 4),
+  acc_rate = round(pmin(pmax(0.68 + if_else(condition_code == 2L, 0.07, 0) + (mem_post - 20) * 0.012 - ((id * 7) %% 11) / 100, 0.55), 0.98), 2),
   attention_check = if_else(id %in% c(17, 54, 88, 113), 0L, 1L),
   completed = if_else(id %in% c(29, 63, 97), 0L, 1L)
 )
@@ -108,8 +78,8 @@ write_csv(raw_data, "./data/memory_raw.csv", na = "")
 
 writexl::write_xlsx(
   x = list(
-    "原始数据" = raw_data,
-    "变量说明" = codebook
+   "原始数据" = raw_data,
+   "变量说明" = codebook
   ),
   path = "./data/memory_raw.xlsx"
 )

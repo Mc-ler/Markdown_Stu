@@ -1,0 +1,41 @@
+---
+title: "Rmd_stu"
+output:
+  pdf_document: 
+    toc: true # 生成目录
+    number_sections: true # 给章节标题自动编号
+    fig_caption: true # 为图表自动添加标题
+header-includes:
+  - \usepackage{booktabs} # 引入用于排版三线表的LaTeX包
+  - \usepackage{float} # 提供更好的图表浮动控制
+
+date: "2026-09-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+$$
+AQI = \max(I_{PM2.5}, I_{PM10}, I_{SO_2}, I_{NO_2}, I_{O_3}, I_{CO})
+$$
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
