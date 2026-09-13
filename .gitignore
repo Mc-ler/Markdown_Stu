@@ -11,3 +11,4 @@ Filter personal and sensitive files:
 .Rhistory
 *.Rout
 *_Rout.txt
+*.RData
