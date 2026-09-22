@@ -5,8 +5,9 @@ library("hrbrthemes")
 
 # pipeline: import data -> depict the data set -> delete invalid data 
 # -> general plot and optimize the figure surface 
-# -> classify the semester -> sort the different semester -> opt(find the most)
-# -> plot basic histograms -> moderate figure feature -> save as .svg or .pdf
+# -> classify the semester -> sort the different semester 
+# -> plot basic histograms -> mask the top and bottom one course -> the average red line
+# -> moderate figure feature -> save as .svg or .pdf
 
 # IMPORT DATA
 raw_data <- read.csv("./data/Query_Grades.csv")
@@ -25,8 +26,12 @@ addno_data <- valid_data |> arrange(desc(总成绩)) |> mutate(No. = sprintf("%0
 # plot the general figure 
 p <- addno_data |>
   ggplot(aes(x = No., y = 总成绩)) +
-    geom_col( fill="#69b3a2", color="#e9ecef", alpha=0.9) +
-    ggtitle("Plot") +
-    theme_ipsum() +
-    theme(plot.title = element_text(size = 14))
+    geom_col( fill="#6A9A66", color="#FFECC3", alpha=0.9) +
+    labs(x = "No.", y = "Total Score",
+         title = "Plot for Score(2024 To 2026)",
+         subtitle = "Full Score is 100 And Source from School Center") +
+    theme_ipsum(base_family = "Arial", plot_title_family = "Arial", subtitle_family = "Arial",
+                grid = "X", axis = "X", ticks = TRUE) +
+    theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+    coord_flip()
 print(p)
