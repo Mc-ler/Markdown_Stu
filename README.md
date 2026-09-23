@@ -4,6 +4,7 @@
 
 - [x] **Study Basic and Extensive Syntax of Markdown**
 - [x] **Calculate Average and statistics parameters**
-- [ ] **Data Visualization**.
-- [ ] **pull and request repository from the older**
+- [ ] **Data Visualization base plot**.
+- [ ] **Data Vis deep insight of scores**
+- [ ] **pull and request repository from the alumnus**
 - [ ] **On thinking**
