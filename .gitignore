@@ -5,6 +5,8 @@ Filter personal and sensitive files:
 /san-juan-mountains-1080.webp
 /Emoji_List_Clone.md
 *.pdf
+*.svg
+*.ttf
 
 # R related
 *.Rproj.user

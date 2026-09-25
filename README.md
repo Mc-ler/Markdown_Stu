@@ -4,7 +4,10 @@
 
 - [x] **Study Basic and Extensive Syntax of Markdown**
 - [x] **Calculate Average and statistics parameters**
-- [ ] **Data Visualization base plot**.
+- [X] **Data Visualization base plot**.
 - [ ] **Data Vis deep insight of scores**
 - [ ] **pull and request repository from the alumnus**
 - [ ] **On thinking**
+
+**First Phrase Exhibit**:
+![Grade Score Figure](./R_plot/output/figure_1.svg)
